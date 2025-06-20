@@ -11,8 +11,15 @@ int main(){
     arbol.append(7);
     arbol.append(1);
 
-    arbol.printTreeInOrder();
+    arbol.cleanTree();
 
+    try{
+        arbol.printTreeInOrder();
+        std::cout<<"fds";
+    }
+    catch(const BSTExcept::NoItems &mensaje){
+        std::cout<<"No hay Items Registrados";
+    }
 
     return 0;
 }

@@ -15,6 +15,7 @@ namespace BST_Nodes{
 
             BST_Node(T*);
             BST_Node(T);
+            ~BST_Node();
 
     };
 
@@ -33,6 +34,14 @@ namespace BST_Nodes{
         rightNode = nullptr;
         father = nullptr;
     }
+
+    template<typename T>
+    BST_Node<T>::~BST_Node(){
+        delete value;
+        leftNode = nullptr;
+        rightNode = nullptr;
+        father= nullptr;
+    }
 }
 
 namespace BST{
@@ -41,7 +50,7 @@ namespace BST{
     template<typename T>
     class BinarySearchTree{
         private:
-            int size;
+            int amount;
             BST_Node<T> *root;
 
             void append(BST_Node<T>*, const T&);
@@ -49,9 +58,15 @@ namespace BST{
             BST_Node<T>* search(BST_Node<T>*, const T&);
             
             void printTreeInOrder(BST_Node<T>*);
+            
+            void cleanTree(BST_Node<T>*);
+            
+            void remove(BST_Node<T>*, const T&);
         public:
             /// @brief Construir el BST por defecto
             BinarySearchTree();
+
+            ~BinarySearchTree();
 
             /// @brief Agregar un elemento al BST
             /// @param  Value Elemento que se va a agregar al BST
@@ -64,13 +79,26 @@ namespace BST{
 
             /// @brief Imprimir el BST completo en orden
             void printTreeInOrder();
+
+            /// @brief Elimina todos los nodos y reestablece el BST
+            void cleanTree();
+
+            /// @brief Cantidad de nodos en el BST
+            /// @return Numero de elementos del BST
+            int size();
             
+            void remove(const T&);
     };
 
     template<typename T>
     BinarySearchTree<T>::BinarySearchTree(){
-        size = 0;
+        amount = 0;
         root = nullptr;
+    }
+
+    template<typename T>
+    BinarySearchTree<T>::~BinarySearchTree(){
+        cleanTree();    
     }
 
     template<typename T>
@@ -78,7 +106,7 @@ namespace BST{
         //Si no hay Elementos en el Árbol
         if(!root){
             root = new BST_Node<T>(element);
-            size++;
+            amount++;
         }
         else //Si hay al menos 1 elemento
             append(root, element);
@@ -90,13 +118,13 @@ namespace BST{
         if((element > *nodo->value) && (nodo->rightNode == nullptr)){
             nodo->rightNode = new BST_Node(element);
             nodo->rightNode->father = nodo;
-            size++;
+            amount++;
         }
         
         if((element < *nodo->value) && (nodo->leftNode == nullptr)){
             nodo->leftNode = new BST_Node(element);
             nodo->leftNode->father = nodo;
-            size++;
+            amount++;
         }
 
         //Si los nodos ya están ocupados
@@ -125,7 +153,7 @@ namespace BST{
     
     template<typename T>
     void BinarySearchTree<T>::printTreeInOrder(){
-        if(size == 0)
+        if(amount == 0)
             throw BSTExcept::NoItems();
         printTreeInOrder(root);
     }
@@ -139,7 +167,28 @@ namespace BST{
             printTreeInOrder(node->rightNode);
     }
 
-    
+    template<typename T>
+    void BinarySearchTree<T>::cleanTree(){
+        if(amount == 0)
+            return;
+        cleanTree(root);
+        root = nullptr;
+        amount = 0;
+    }
+
+    template<typename T>
+    void BinarySearchTree<T>::cleanTree(BST_Node<T>* node){
+        if(node->leftNode != nullptr)
+            cleanTree(node->leftNode);
+        if(node->rightNode != nullptr)
+            cleanTree(node->rightNode);
+        delete node;
+    }
+
+    template<typename T>
+    int BinarySearchTree<T>::size(){
+        return amount;
+    }
 }
 
 #endif
