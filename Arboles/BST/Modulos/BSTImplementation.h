@@ -61,11 +61,14 @@ namespace BST{
             
             void cleanTree(BST_Node<T>*);
             
-            void remove(BST_Node<T>*, const T&);
+            //Auxiliares para eliminar nodos
+            void removeSheet(BST_Node<T>*);
+            void remove1Son(BST_Node<T>*);
+            void remove2Sons(BST_Node<T>*);
+            BST_Node<T>* findMenorNode(BST_Node<T>*);
         public:
             /// @brief Construir el BST por defecto
             BinarySearchTree();
-
             ~BinarySearchTree();
 
             /// @brief Agregar un elemento al BST
@@ -87,7 +90,9 @@ namespace BST{
             /// @return Numero de elementos del BST
             int size();
             
-            void remove(const T&);
+            /// @brief Eliminar un elemento del BST
+            /// @param  Elemento a eliminar del BST
+            void remove(T);
     };
 
     template<typename T>
@@ -188,6 +193,107 @@ namespace BST{
     template<typename T>
     int BinarySearchTree<T>::size(){
         return amount;
+    }
+
+    template<typename T>
+    void BinarySearchTree<T>::remove(T element){
+        if(amount == 0)
+            throw BSTExcept::NoItems();
+        
+        BST_Node<T>* node = search(element);
+        //SI es un nodo hoja
+        if((node->leftNode == nullptr) && (node->rightNode == nullptr))
+            removeSheet(node);
+
+        //Si solo tiene un Hijo
+        else if(((node->leftNode != nullptr) && (node->rightNode == nullptr)) || ((node->leftNode == nullptr) && (node->rightNode != nullptr)))
+            remove1Son(node);   
+
+        else
+            remove2Sons(node);
+
+        amount--;
+    }
+
+    template<typename T>
+    void BinarySearchTree<T>::removeSheet(BST_Node<T>* node){
+        if(node == root)
+            root = nullptr;
+
+        else if(node->father->leftNode == node)
+                node->father->leftNode = nullptr;
+            else
+                node->father->rightNode = nullptr;
+
+        delete node;
+    }
+
+    template<typename T>
+    void BinarySearchTree<T>::remove1Son(BST_Node<T>* node){
+        if(node == root)
+            if(node->leftNode != nullptr)
+                root = node->leftNode;
+            else
+                root = node->rightNode;
+
+        else if(node->father->leftNode == node){
+            if(node->leftNode != nullptr)
+                node->father->leftNode = node->leftNode;
+            else
+                node->father->leftNode = node->rightNode;
+        }
+
+        else if(node->father->rightNode == node){
+            if(node->leftNode != nullptr)
+                node->father->rightNode = node->leftNode;
+            else
+                node->father->rightNode = node->rightNode;
+        }
+        delete node;
+    }
+
+    template<typename T>
+    BST_Node<T>* BinarySearchTree<T>::findMenorNode(BST_Node<T>* node){
+        if(node->leftNode != nullptr)
+            return findMenorNode(node->leftNode);
+        else
+            return node;
+    }
+
+    template<typename T>
+    void BinarySearchTree<T>::remove2Sons(BST_Node<T>* node){
+        BST_Node<T>* succesor = findMenorNode(node->rightNode);
+        //Si no es la raíz
+        if(node != root){
+            //Encontrar lado en el que el nodo esta respecto al padre:
+            if(node->father->leftNode == node)
+                node->father->leftNode = succesor;    
+
+            else
+                node->father->rightNode = succesor;
+            
+            node->leftNode->father = succesor;
+
+            if(node->rightNode != succesor)
+                node->rightNode->father = succesor;
+            
+            succesor->leftNode = node->leftNode;
+            if(node->rightNode != succesor)
+                succesor->rightNode = node->rightNode;
+            succesor->father = node->father;
+        }
+        //Si es la raíz
+        else{
+            if(succesor->rightNode != nullptr)
+                succesor->father->leftNode = succesor->rightNode;
+            else
+                succesor->father->leftNode = nullptr;
+            succesor->father = nullptr;
+            succesor->leftNode = root->leftNode;
+            succesor->rightNode = root->rightNode;
+            root = succesor;
+        }
+        delete node;
     }
 }
 

@@ -4,22 +4,14 @@
 int main(){
     BST::BinarySearchTree<int> arbol;
 
-    arbol.append(4);
-    arbol.append(5);
-    arbol.append(2);
-    arbol.append(6);
-    arbol.append(7);
-    arbol.append(1);
+    arbol.append(32);
+    arbol.append(40);
+    arbol.append(50);
+    arbol.append(39);
 
-    arbol.cleanTree();
+    arbol.remove(32);
 
-    try{
-        arbol.printTreeInOrder();
-        std::cout<<"fds";
-    }
-    catch(const BSTExcept::NoItems &mensaje){
-        std::cout<<"No hay Items Registrados";
-    }
+    arbol.printTreeInOrder();
 
     return 0;
 }
