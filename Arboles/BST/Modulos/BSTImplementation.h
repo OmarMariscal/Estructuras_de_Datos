@@ -60,7 +60,7 @@ namespace BST{
             void printTreeInOrder(BST_Node<T>*);
             
             void cleanTree(BST_Node<T>*);
-            
+
             //Auxiliares para eliminar nodos
             void removeSheet(BST_Node<T>*);
             void remove1Son(BST_Node<T>*);
@@ -93,6 +93,14 @@ namespace BST{
             /// @brief Eliminar un elemento del BST
             /// @param  Elemento a eliminar del BST
             void remove(T);
+
+            int calculateHeight(BST_Node<T>*);
+            int calculateFE(BST_Node<T>*);
+
+            void simpleRotationToRight(BST_Node<T>*);
+            void simpleRotationToLeft(BST_Node<T>*);
+            void doubleRotationToRight(BST_Node<T>*);
+            void doubleRotationToLeft(BST_Node<T>*);
     };
 
     template<typename T>
@@ -294,6 +302,92 @@ namespace BST{
             root = succesor;
         }
         delete node;
+    }
+
+    template <typename T>
+    int BinarySearchTree<T>::calculateHeight(BST_Node<T>* node){
+        if(node == nullptr)
+            return 0;
+        else{
+            int altura_izquierda = calculateHeight(node->leftNode);
+            int altura_derecha = calculateHeight(node->rightNode);
+
+            if(altura_izquierda>= altura_derecha)
+                return 1 + altura_izquierda;
+            return 1 + altura_derecha;
+        }
+        
+    }
+
+    template<typename T>
+    int BinarySearchTree<T>::calculateFE(BST_Node<T>* node){
+        return calculateHeight(node->rightNode) - calculateHeight(node->leftNode);
+    }
+
+    template<typename T>
+    void BinarySearchTree<T>::simpleRotationToRight(BST_Node<T>* node){
+        BST_Node<T>* qNode = node->leftNode;
+
+        node->leftNode = qNode->rightNode;
+        qNode->rightNode->father = node;
+
+        qNode->rightNode = node;
+
+        if(node->father != nullptr)
+            node->father->rightNode = qNode;
+        
+        if(qNode->rightNode != nullptr)
+            qNode->rightNode->father = node;
+        
+        //Reasignación de padres
+        qNode->father = node->father;
+        node->father = qNode;
+
+
+        if(root == node){
+            root = qNode;
+            root->father = nullptr;
+        }
+    }
+
+    template<typename T>
+    void BinarySearchTree<T>::simpleRotationToLeft(BST_Node<T>* node){
+        BST_Node<T>* qNode = node->rightNode;
+
+        node->rightNode = qNode->leftNode;
+        qNode->leftNode->father = node;
+
+        qNode->leftNode = node;
+
+        if(node->father != nullptr)
+            node->father->leftNode = qNode;
+        
+        if(qNode->leftNode != nullptr)
+            qNode->leftNode->father = node;
+
+        //Reasignación de Padres
+            
+        qNode->father = node->father;
+        node->father = qNode;
+
+
+        if(root == node){
+            root = qNode;    
+            root->father = nullptr;        
+        }
+
+    }
+
+    template<typename T>
+    void BinarySearchTree<T>::doubleRotationToRight(BST_Node<T>* node){
+        simpleRotationToLeft(node->leftNode);
+        simpleRotationToRight(node);
+    }
+
+    template<typename T>
+    void BinarySearchTree<T>::doubleRotationToLeft(BST_Node<T>* node){
+        simpleRotationToRight(node->rightNode);
+        simpleRotationToLeft(node);
     }
 }
 
