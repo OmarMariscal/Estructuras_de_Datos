@@ -61,6 +61,9 @@ namespace BST{
             
             void cleanTree(BST_Node<T>*);
 
+            void balanceTree(BST_Node<T>*);
+            void balanceSubTree(BST_Node<T>*, int);
+
             //Auxiliares para eliminar nodos
             void removeSheet(BST_Node<T>*);
             void remove1Son(BST_Node<T>*);
@@ -146,6 +149,8 @@ namespace BST{
         if((element < *nodo->value) && (nodo->leftNode != nullptr))
             append(nodo->leftNode,element);
 
+        //Balancear el Árbol
+        balanceTree(root);
     }
 
     template<typename T>
@@ -329,20 +334,18 @@ namespace BST{
         BST_Node<T>* qNode = node->leftNode;
 
         node->leftNode = qNode->rightNode;
-        qNode->rightNode->father = node;
-
+        if(qNode->rightNode != nullptr)
+            qNode->rightNode->father = node;
         qNode->rightNode = node;
 
         if(node->father != nullptr)
             node->father->rightNode = qNode;
-        
         if(qNode->rightNode != nullptr)
             qNode->rightNode->father = node;
         
         //Reasignación de padres
         qNode->father = node->father;
         node->father = qNode;
-
 
         if(root == node){
             root = qNode;
@@ -355,7 +358,9 @@ namespace BST{
         BST_Node<T>* qNode = node->rightNode;
 
         node->rightNode = qNode->leftNode;
-        qNode->leftNode->father = node;
+
+        if(qNode->leftNode != nullptr)
+            qNode->leftNode->father = node;
 
         qNode->leftNode = node;
 
@@ -366,10 +371,8 @@ namespace BST{
             qNode->leftNode->father = node;
 
         //Reasignación de Padres
-            
         qNode->father = node->father;
         node->father = qNode;
-
 
         if(root == node){
             root = qNode;    
@@ -388,6 +391,34 @@ namespace BST{
     void BinarySearchTree<T>::doubleRotationToLeft(BST_Node<T>* node){
         simpleRotationToRight(node->rightNode);
         simpleRotationToLeft(node);
+    }
+
+    template <typename T>
+    void BinarySearchTree<T>::balanceTree(BST_Node<T>* node){
+        if(node->leftNode != nullptr)
+            balanceTree(node->leftNode);
+        if(node->rightNode != nullptr)
+            balanceTree(node->rightNode);
+        int FE = calculateFE(node);
+        if(FE == 2 || FE == -2)
+            balanceSubTree(node,FE);
+    }
+
+    template <typename T>
+    void BinarySearchTree<T>::balanceSubTree(BST_Node<T>* node, int FE){
+        if(FE  == -2){
+            if(calculateFE(node->leftNode) == -1)
+                simpleRotationToRight(node);
+            if(calculateFE(node->leftNode) == 1)
+                doubleRotationToRight(node);
+        }
+
+        if(FE == 2){
+            if(calculateFE(node->rightNode) == 1)
+                simpleRotationToLeft(node);
+            if(calculateFE(node->rightNode) == -1)
+                doubleRotationToLeft(node);
+        }
     }
 }
 

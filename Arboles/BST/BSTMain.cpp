@@ -9,10 +9,12 @@ int main(){
     arbol.append(10);
     arbol.append(7);
     arbol.append(12);
+    
     arbol.append(6);
+    std::cout<<"fasdfas";
     arbol.append(8);
 
-    arbol.doubleRotationToLeft(arbol.search(5));
+    arbol.printTreeInOrder();
 
     return 0;
 }
